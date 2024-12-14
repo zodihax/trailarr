@@ -321,9 +321,9 @@ class PlexConnectionManager(ABC):
             list[_MediaCreate]: list of parsed media objects."""
         media_data = await self.get_media_data()
         return MediaCreate(
-                    plex_ratingkey=media_data.ratingKey,
-                    title=media_data.title,
-                    year=media_data.year,
+                    plex_ratingkey=media_data['ratingKey'],
+                    title=media_data['title'],
+                    year=media_data['year'],
                 )    
     
     def get_media(self, title: str, year: int) -> int | None:

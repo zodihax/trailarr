@@ -282,17 +282,20 @@ class PlexConnectionManager(ABC):
 
     plex_manager: PlexManagerProtocol
     connection_id: int
+    parse_media: Callable[[int, dict[str, Any]], MediaCreate]
 
     def __init__(
         self,
         connection: ConnectionRead,
         plex_manager: PlexManagerProtocol,
+        parse_media: Callable[[int, dict[str, Any]], MediaCreate],
     ):
         """Initialize the PlexConnectionManager. \n
         Args:
             connection (ConnectionRead): The connection data."""
         self.connection_id = connection.id
         self.plex_manager = plex_manager
+        self.parse_media = parse_media
 
     async def get_system_status(self):
         """Get the system status from Plex. \n
@@ -320,11 +323,10 @@ class PlexConnectionManager(ABC):
         Returns:
             list[_MediaCreate]: list of parsed media objects."""
         media_data = await self.get_media_data()
-        return MediaCreate(
-                    plex_ratingkey=media_data['ratingKey'],
-                    title=media_data['title'],
-                    year=media_data['year'],
-                )    
+        return [
+            self.parse_media(self.connection_id, each_media_data)
+            for each_media_data in media_data
+        ]
     
     def get_media(self, title: str, year: int) -> int | None:
         """Queries the database to get a match of media by title and year.
@@ -361,9 +363,17 @@ class PlexConnectionManager(ABC):
             media for media in media_data 
             if self.get_media(media.title, media.year) is not None
         ]
+
+        existing_media2 = [
+            MediaCreate(
+                id=self.get_media(media.title, media.year),
+                plex_ratingkey=media.plex_ratingkey
+            )
+            for media in existing_media
+        ]        
         
         # Update existing media in bulk
-        updated_media = MediaDatabaseManager().create_or_update_bulk(existing_media)
+        updated_media = MediaDatabaseManager().create_or_update_bulk(existing_media2)
         
         # Convert database results to MediaReadDC objects
         return [

@@ -19,8 +19,8 @@ export class AddConnectionComponent {
   url = new FormControl('', [Validators.required, Validators.pattern('https?://.*:\\d{2,}')]);
   apiKey = new FormControl('', [
     Validators.required,
-    Validators.pattern('^[a-zA-Z0-9]*$'),
-    Validators.minLength(32),
+    Validators.pattern('^[a-zA-Z0-9\-]*$'),
+    Validators.minLength(20),
     Validators.maxLength(50)
   ]);
   addConnectionForm = new FormGroup({

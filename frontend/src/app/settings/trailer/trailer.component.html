@@ -203,6 +203,21 @@
         </div>
         <div class="trailer-content">
             <div class="content-label">
+                <span for="trailer_check_plex">Check Plex for trailer</span>
+                <small>Check Plex if trailer already exists, and skip if it does.</small>
+            </div>
+            <div id="trailer_check_plex" class="options-bar">
+                <div *ngFor="let option of trueFalseOptions" class="option" tabindex="12"
+                    [class.selected]="option === settings?.trailer_check_plex"
+                    (click)="updateSetting('trailer_check_plex', option)"
+                    (keydown.enter)="updateSetting('trailer_check_plex', option)"
+                    (keydown.space)="updateSetting('trailer_check_plex', option)">
+                    {{option}}
+                </div>
+            </div>
+        </div>
+        <div class="trailer-content">
+            <div class="content-label">
                 <span for="trailer_subtitles_enabled">Trailer Subtitles Enabled</span>
                 <small>Download subtitles and added them to trailer file, if available.</small>
             </div>

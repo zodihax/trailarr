@@ -1,9 +1,10 @@
 import asyncio
 from datetime import datetime, timedelta
 from core.base.database.manager.connection import ConnectionDatabaseManager
-from core.base.database.models.connection import ArrType, ConnectionRead
+from core.base.database.models.connection import ArrType, ConnectionRead, MediaType
 from core.radarr.connection_manager import RadarrConnectionManager
 from core.sonarr.connection_manager import SonarrConnectionManager
+from core.plex.connection_manager import PlexConnectionManager
 from app_logger import ModuleLogger
 from core.tasks.image_refresh import refresh_images
 from core.tasks import scheduler
@@ -35,11 +36,13 @@ async def api_refresh_by_id(connection: ConnectionRead, image_refresh=True) -> N
         connection_db_manager = SonarrConnectionManager(connection)
     elif connection.arr_type == ArrType.RADARR:
         connection_db_manager = RadarrConnectionManager(connection)
+    elif connection.media_type == MediaType.PLEX:
+        connection_db_manager = PlexConnectionManager(connection)
     else:
         logger.warning(
             f"Invalid connection type: {connection.arr_type} for connection: {connection}"
         )
-        return
+        return      
 
     # Refresh data from API
     await connection_db_manager.refresh()

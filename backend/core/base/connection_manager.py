@@ -334,3 +334,5 @@ class PlexConnectionManager(ABC):
             plex_trailer_exists=plex_trailer_exists,
         )
         MediaDatabaseManager().update_media_status(entry)
+
+#todo implement refresh function to update all in database

@@ -20,6 +20,7 @@ export interface Settings {
     trailer_subtitles_enabled: boolean
     trailer_subtitles_format: string
     trailer_subtitles_language: string
+    trailer_check_plex: boolean
     trailer_file_format: string
     trailer_embed_metadata: boolean
     trailer_remove_sponsorblocks: boolean

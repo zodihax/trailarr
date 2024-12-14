@@ -51,6 +51,7 @@ class Settings(BaseModel):
     trailer_subtitles_enabled: bool
     trailer_subtitles_format: str
     trailer_subtitles_language: str
+    trailer_check_plex: bool
     trailer_embed_metadata: bool
     trailer_min_duration: int
     trailer_max_duration: int

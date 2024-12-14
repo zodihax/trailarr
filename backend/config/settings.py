@@ -110,6 +110,10 @@ class _Config:
         self.trailer_subtitles_language = os.getenv(
             "TRAILER_SUBTITLES_LANGUAGE", self._DEFAULT_LANGUAGE
         )
+        self.trailer_check_plex = os.getenv(
+            "TRAILER_CHECK_PLEX",
+            "True",
+        ).lower() in ["true", "1"]
         self.trailer_file_format = os.getenv(
             "TRAILER_FILE_FORMAT", self._DEFAULT_FILE_FORMAT
         )
@@ -168,6 +172,7 @@ class _Config:
             "trailer_subtitles_enabled": self.trailer_subtitles_enabled,
             "trailer_subtitles_format": self.trailer_subtitles_format,
             "trailer_subtitles_language": self.trailer_subtitles_language,
+            "trailer_check_plex": self.trailer_check_plex,
             "trailer_video_format": self.trailer_video_format,
             "trailer_web_optimized": self.trailer_web_optimized,
             "server_start_time": self.server_start_time,
@@ -423,6 +428,18 @@ class _Config:
     def trailer_subtitles_language(self, value: str):
         self._trailer_language = value
         self._save_to_env("TRAILER_SUBTITLES_LANGUAGE", self._trailer_language)
+
+    @property
+    def trailer_check_plex(self):
+        """Check Plex if trailer already exists
+                Default is False. \n
+        Valid values are True/False."""
+        return self._check_plex
+
+    @trailer_check_plex.setter
+    def trailer_check_plex(self, value: bool):
+        self._check_plex = value
+        self._save_to_env("TRAILER_CHECK_PLEX", self._check_plex)
 
     @property
     def trailer_resolution(self) -> int:

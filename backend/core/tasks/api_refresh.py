@@ -36,7 +36,8 @@ async def api_refresh_by_id(connection: ConnectionRead, image_refresh=True) -> N
         connection_db_manager = SonarrConnectionManager(connection)
     elif connection.arr_type == ArrType.RADARR:
         connection_db_manager = RadarrConnectionManager(connection)
-    elif connection.media_type == MediaType.PLEX:
+    #elif connection.media_type == MediaType.PLEX:
+    elif connection.arr_type == ArrType.PLEX:
         connection_db_manager = PlexConnectionManager(connection)
     else:
         logger.warning(

@@ -57,10 +57,10 @@ class ConnectionBase(SQLModel):
 
     name: str
     arr_type: ArrType
-    media_type: MediaType
+    #media_type: MediaType
     url: str
     api_key: str
-    plex_token: str
+    #plex_token: str
     monitor: MonitorType
     # path_mappings: list[PathMappingCreate] = []
 
@@ -96,9 +96,9 @@ class ConnectionUpdate(ConnectionBase):
 
     name: str | None = None
     arr_type: ArrType | None = None
-    media_type: MediaType | None = None
+    #media_type: MediaType | None = None
     url: str | None = None
     api_key: str | None = None
-    plex_token: str | None = None
+    #plex_token: str | None = None
     monitor: MonitorType | None = None
     path_mappings: list[PathMappingCRU]

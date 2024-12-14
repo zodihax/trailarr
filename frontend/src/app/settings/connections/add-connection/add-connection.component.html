@@ -15,15 +15,14 @@
                 <span>Arr Type: </span>
                 <div id="arrtype" class="options-bar">
                     <div *ngFor="let option of arrOptions" class="option" tabindex="2"
-                         [class.selected]="option === addConnectionForm.value.arrType" 
-                         (click)="setArrType(option)"
-                         (keydown.enter)="setArrType(option)"
-                         (keydown.space)="setArrType(option)">
+                    [class.selected]="option === addConnectionForm.value.arrType" 
+                    (click)="setArrType(option)"
+                    (keydown.enter)="setArrType(option)"
+                    (keydown.space)="setArrType(option)">
                         {{option | uppercase }}
                     </div>
                 </div>
             </div>
-        </div>
         
             <div class="option-container">
                 <span>Monitor Type: </span>

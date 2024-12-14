@@ -58,89 +58,51 @@ class PlexManager(AsyncBasePlexManager):
             return media
         raise InvalidResponseError("Invalid response from Plex API")
 
-    async def get_all_movies(self):
-        """Get all movies from the Plex API
+    async def get_all_movies(self) -> list[dict[str, Any]]:
+        """Get all movies from the Plex API.
 
         Returns:
-            list[str, Any]: All movies with their Metadata from the Plex API
+            List[Dict[str, Any]]: All movies with their Metadata from the Plex API.
 
         Raises:
-            ConnectionError: If the connection is refused / response is not 200
-            ConnectionTimeoutError: If the connection times out
-            InvalidResponseError: If the API response is invalid
+            ConnectionError: If the connection is refused / response is not 200.
+            ConnectionTimeoutError: If the connection times out.
+            InvalidResponseError: If the API response is invalid.
         """
         section_ids = await self._get_all_section_ids()
         movies = []
         for section_id in section_ids:
             response = await self._request("GET", f"/library/sections/{section_id}/all?type=1")
-            movies.extend(response.get('MediaContainer', {}).get('Metadata', []))
-        if isinstance(movies, list):
-            return movies
-        raise InvalidResponseError("Invalid response from Plex API")
+            metadata = response.get('MediaContainer', {}).get('Metadata', [])
+            if isinstance(movies, list):
+                movies.extend(metadata)
+            else:
+                raise InvalidResponseError("Invalid response format for Metadata in Plex API")            
+        return movies
 
-    async def get_all_series(self):
-        """Get all series from the Plex API
+    async def get_all_series(self) -> list[dict[str, Any]]:
+        """Get all series from the Plex API.
 
         Returns:
-            list[str, Any]: All series with their Metadata from the Plex API
+            List[Dict[str, Any]]: All series with their Metadata from the Plex API.
 
         Raises:
-            ConnectionError: If the connection is refused / response is not 200
-            ConnectionTimeoutError: If the connection times out
-            InvalidResponseError: If the API response is invalid
+            ConnectionError: If the connection is refused / response is not 200.
+            ConnectionTimeoutError: If the connection times out.
+            InvalidResponseError: If the API response is invalid.
         """
         section_ids = await self._get_all_section_ids()
         series = []
         for section_id in section_ids:
             response = await self._request("GET", f"/library/sections/{section_id}/all?type=2")
-            series.extend(response.get('MediaContainer', {}).get('Metadata', []))
-        if isinstance(series, list):
-            return series
-        raise InvalidResponseError("Invalid response from Plex API")
-    
-    async def get_movie(self, title, year=None):
-        """Get rating key of movie from the Plex API
+            metadata = response.get('MediaContainer', {}).get('Metadata', [])
+            if isinstance(series, list):
+                series.extend(metadata)
+            else:
+                raise InvalidResponseError("Invalid response format for Metadata in Plex API")            
+        return series
 
-        Returns:
-            str: rating key
-
-        Raises:
-            ConnectionError: If the connection is refused / response is not 200
-            ConnectionTimeoutError: If the connection times out
-            InvalidResponseError: If the API response is invalid
-        """
-        metadata = self.get_all_movies()
-        for item in metadata:
-            plex_title = item.get('title', '').lower()
-            plex_year = item.get('year')
-
-            if plex_title == title.lower():
-                if year is None or str(plex_year) == str(year):
-                    return item.get('ratingKey')
-        return None
-    
-    async def get_series(self, title, year=None):
-        """Get rating key of series from the Plex API
-
-        Returns:
-            str: rating key
-
-        Raises:
-            ConnectionError: If the connection is refused / response is not 200
-            ConnectionTimeoutError: If the connection times out
-            InvalidResponseError: If the API response is invalid
-        """
-        metadata = self.get_all_series()
-        for item in metadata:
-            plex_title = item.get('title', '').lower()
-            plex_year = item.get('year')
-
-            if plex_title == title.lower():
-                if year is None or str(plex_year) == str(year):
-                    return item.get('ratingKey')
-        return None
-
-    async def get_all_media(self):
+    async def get_all_media(self) -> list[dict[str, Any]]:
         """Get all media from the Plex API
 
         Returns:

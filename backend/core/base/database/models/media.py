@@ -30,8 +30,7 @@ class MediaBase(SQLModel):
     connection_id: int = Field(
         foreign_key=ForeignKey("connection.id", on_delete="CASCADE"), index=True
     )
-    arr_id: int = Field(index=True)
-    plex_ratingkey: int = Field(index=True)
+    arr_id: int = Field(index=True)    
     is_movie: bool = Field(default=True, index=True)
     title: str = Field(index=True)
     year: int = Field(default_factory=get_current_year, index=True)
@@ -40,6 +39,7 @@ class MediaBase(SQLModel):
     runtime: int = 0
     # website: str | None = None
     youtube_trailer_id: str | None = None
+    plex_ratingkey: int | None = None
     folder_path: str | None = None
     imdb_id: str | None = Field(default=None, index=True)
     txdb_id: str = Field(index=True)
@@ -81,6 +81,7 @@ class MediaCreate(MediaBase):
     - youtube_trailer_id: None
     - trailer_exists: False
     - plex_trailer_exists: False
+    - plex_ratingkey: None
     - monitor: False
     - arr_monitored: False
     """

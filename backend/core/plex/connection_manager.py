@@ -4,7 +4,7 @@ from core.plex.api_manager import PlexManager
 
 
 class PlexConnectionManager(PlexConnectionManager):
-    """Connection manager for working with the Plex application."""
+    """Connection manager for working with Plex."""
 
     connection_id: int
 

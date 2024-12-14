@@ -3,16 +3,16 @@ from exceptions import InvalidResponseError
 from core.base.plex_manager.request_manager import AsyncRequestManager
 
 
-class AsyncBaseArrManager(AsyncRequestManager):
-    """Base class for async requests to Arr API"""
+class AsyncBasePlexManager(AsyncRequestManager):
+    """Base class for async requests to Plex API"""
 
     def __init__(self, url: str, token: str, version: str = ""):
         """
-        Constructor for connection to Arr API
+        Constructor for connection to Plex API
 
         Args:
-            url (str): Host URL to Arr API
-            token (str): Plex Token for Arr API
+            url (str): Host URL to Plex API
+            token (str): Plex Token for Plex API
 
         Returns:
             None
@@ -20,7 +20,7 @@ class AsyncBaseArrManager(AsyncRequestManager):
         super().__init__(url, token)
 
     async def _get_system_status(self) -> str:
-        """Get the system status of the Arr API
+        """Get the system status of the Plex API
         Returns:
             str: The status of the Plex API if successful.
 

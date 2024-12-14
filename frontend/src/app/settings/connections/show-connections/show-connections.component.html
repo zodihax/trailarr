@@ -27,6 +27,7 @@
                 <a class="link-image" target="_blank" href="{{connection.url}}">
                     <img *ngIf="connection.arr_type == 'sonarr'" src="assets/sonarr_128.png"/>
                     <img *ngIf="connection.arr_type == 'radarr'" src="assets/radarr_128.png"/>
+                    <img *ngIf="connection.arr_type == 'plex'" src="assets/plex_128.png"/>
                 </a>
                 <div class="buttons">
                     <button class="animated-button secondary" (click)="selectedId = connection.id; showDeleteDialog()">

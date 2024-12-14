@@ -11,6 +11,7 @@ def get_current_time():
 class ArrType(Enum):
     RADARR = "radarr"
     SONARR = "sonarr"
+    PLEX = "plex"
 
 class MediaType(Enum):
     PLEX = "plex"

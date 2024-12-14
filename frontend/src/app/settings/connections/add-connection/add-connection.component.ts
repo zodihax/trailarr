@@ -13,7 +13,7 @@ import { SettingsService } from '../../../services/settings.service';
 export class AddConnectionComponent {
 
   constructor(private _location: Location, private settingsService: SettingsService) { }
-  arrOptions = ['radarr', 'sonarr'];
+  arrOptions = ['radarr', 'sonarr', 'plex'];
   monitorOptions = ['missing', 'new', 'none', 'sync'];
   name = new FormControl('', [Validators.required, Validators.minLength(3)]);
   url = new FormControl('', [Validators.required, Validators.pattern('https?://.*:\\d{2,}')]);

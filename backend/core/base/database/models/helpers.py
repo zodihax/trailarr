@@ -50,7 +50,8 @@ class MediaUpdateDC:
     trailer_exists: bool | None = None
     yt_id: str | None = None
     downloaded_at: datetime | None = None
-
+    plex_ratingkey: int | None = None
+    plex_trailer_exists: bool | None = None
 
 language_names = {
     "ar": "Arabic",

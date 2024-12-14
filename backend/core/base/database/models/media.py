@@ -92,6 +92,8 @@ class MediaRead(MediaBase):
     """Media model for reading media."""
 
     id: int
+    title: str
+    year: int
     added_at: datetime
     updated_at: datetime
     downloaded_at: datetime | None

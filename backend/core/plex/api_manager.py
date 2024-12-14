@@ -62,7 +62,7 @@ class PlexManager(AsyncBasePlexManager):
         """Get all movies from the Plex API
 
         Returns:
-            dict[str, Any]: All movies with their Metadata from the Plex API
+            list[str, Any]: All movies with their Metadata from the Plex API
 
         Raises:
             ConnectionError: If the connection is refused / response is not 200
@@ -82,7 +82,7 @@ class PlexManager(AsyncBasePlexManager):
         """Get all series from the Plex API
 
         Returns:
-            dict[str, Any]: All series with their Metadata from the Plex API
+            list[str, Any]: All series with their Metadata from the Plex API
 
         Raises:
             ConnectionError: If the connection is refused / response is not 200
@@ -99,6 +99,16 @@ class PlexManager(AsyncBasePlexManager):
         raise InvalidResponseError("Invalid response from Plex API")
     
     async def get_movie(self, title, year=None):
+        """Get rating key of movie from the Plex API
+
+        Returns:
+            str: rating key
+
+        Raises:
+            ConnectionError: If the connection is refused / response is not 200
+            ConnectionTimeoutError: If the connection times out
+            InvalidResponseError: If the API response is invalid
+        """
         metadata = self.get_all_movies()
         for item in metadata:
             plex_title = item.get('title', '').lower()
@@ -110,6 +120,16 @@ class PlexManager(AsyncBasePlexManager):
         return None
     
     async def get_series(self, title, year=None):
+        """Get rating key of series from the Plex API
+
+        Returns:
+            str: rating key
+
+        Raises:
+            ConnectionError: If the connection is refused / response is not 200
+            ConnectionTimeoutError: If the connection times out
+            InvalidResponseError: If the API response is invalid
+        """
         metadata = self.get_all_series()
         for item in metadata:
             plex_title = item.get('title', '').lower()
@@ -121,9 +141,30 @@ class PlexManager(AsyncBasePlexManager):
         return None
 
     async def get_all_media(self):
+        """Get all media from the Plex API
+
+        Returns:
+            list[str, Any]: All series with their Metadata from the Plex API
+        """
         movies = await self.get_all_movies()
         series = await self.get_all_series()
         return movies + series
         
-    async def has_trailer(self):
-        
+    async def has_trailers(self, rating_key):
+        """Checks if media has trailers
+
+        Args:
+            rating_key (int): The rating key of the media to get
+
+        Returns:
+            bool: does the media have trailer
+
+        Raises:
+            ConnectionError: If the connection is refused / response is not 200
+            ConnectionTimeoutError: If the connection times out
+            InvalidResponseError: If the API response is invalid
+        """
+        response = await self._request("GET", f"/library/metadata/{rating_key}/extras")
+        extras = response.get('MediaContainer', {}).get('Metadata', [])
+        trailers = [extra for extra in extras if extra.get('subtype') == 'trailer']
+        return len(trailers) > 0

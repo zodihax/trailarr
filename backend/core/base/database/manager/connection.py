@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from core.base.database.models.connection import (
     ArrType,
+    MediaManager,
     Connection,
     ConnectionBase,
     ConnectionCreate,
@@ -14,6 +15,7 @@ from core.base.database.utils.engine import manage_session
 from exceptions import ItemNotFoundError
 from core.radarr.api_manager import RadarrManager
 from core.sonarr.api_manager import SonarrManager
+from core.plex.api_manager import PlexManager
 
 
 class ConnectionDatabaseManager:
@@ -324,5 +326,8 @@ async def validate_connection(connection: ConnectionBase) -> str:
     if connection.arr_type == ArrType.SONARR:
         arr_connection = SonarrManager(connection.url, connection.api_key)
         status_message = await arr_connection.get_system_status()
+    if connection.media_manager == MediaManager.PLEX:
+        media_connection = PlexManager(connection.url, connection.plex_token)
+        status_message = await media_connection.get.get_system_status()
 
     return status_message

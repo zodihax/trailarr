@@ -31,6 +31,7 @@ class MediaBase(SQLModel):
         foreign_key=ForeignKey("connection.id", on_delete="CASCADE"), index=True
     )
     arr_id: int = Field(index=True)
+    plex_ratingkey: int = Field(index=True)
     is_movie: bool = Field(default=True, index=True)
     title: str = Field(index=True)
     year: int = Field(default_factory=get_current_year, index=True)
@@ -47,6 +48,7 @@ class MediaBase(SQLModel):
     poster_path: str | None = None
     fanart_path: str | None = None
     trailer_exists: bool = Field(default=False)
+    plex_trailer_exists: bool = Field(default=False)
     monitor: bool = Field(default=False)
     arr_monitored: bool = Field(default=False)
     status: MonitorStatus = Field(default=MonitorStatus.MISSING)
@@ -78,6 +80,7 @@ class MediaCreate(MediaBase):
     - runtime: 0
     - youtube_trailer_id: None
     - trailer_exists: False
+    - plex_trailer_exists: False
     - monitor: False
     - arr_monitored: False
     """
@@ -102,12 +105,14 @@ class MediaUpdate(MediaBase):
 
     connection_id: int | None = None
     arr_id: int | None = None
+    plex_ratingkey: int | None = None
     title: str | None = None
     year: int | None = None
     language: str | None = None
     runtime: int | None = None
     txdb_id: str | None = None
     trailer_exists: bool | None = None
+    plex_trailer_exists: bool | None = None
     monitor: bool | None = None
     arr_monitored: bool | None = None
 

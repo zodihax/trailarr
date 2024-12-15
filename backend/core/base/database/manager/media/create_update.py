@@ -64,6 +64,7 @@ class MediaCreateUpdateManager:
         media_create_list: list[MediaCreate],
         *,
         _session: Session = None,  # type: ignore
+        isPlex: bool = False,
     ) -> list[tuple[MediaRead, bool]]:
         """Create or update multiple media objects in the database at once. \n
         If media already exists, it will be updated, otherwise it will be created.\n
@@ -84,7 +85,7 @@ class MediaCreateUpdateManager:
         new_count: int = 0
         updated_count: int = 0
         for media_create in media_create_list:
-            db_media, created, updated = self._create_or_update(media_create, _session)
+            db_media, created, updated = self._create_or_update(media_create, _session, isPlex)
             db_media_list.append((db_media, created))
             if created:
                 new_count += 1

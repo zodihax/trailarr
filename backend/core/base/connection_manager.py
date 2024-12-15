@@ -391,6 +391,8 @@ class PlexConnectionManager(ABC):
             update_list.append(
                 MediaUpdateDC(
                     id=media_read.id,
+                    monitor=media_read.monitor,
+                    status=media_read.status,
                     plex_trailer_exists=trailer_exists,
                     plex_rating_key=media_read.plex_rating_key,
                 )

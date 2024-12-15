@@ -26,7 +26,7 @@ class ArrManagerProtocol(Protocol):
         Returns:
             list[dict[str, Any]]: The media from the Arr application."""
         raise NotImplementedError("Subclasses must implement this method")
-    
+
 
 class PlexManagerProtocol(Protocol):
     """Abstract class for getting data from the Plex APIs."""
@@ -36,7 +36,7 @@ class PlexManagerProtocol(Protocol):
         Returns:
             str: The system status from Plex."""
         raise NotImplementedError("Subclasses must implement this method")
-    
+
     async def get_all_media(self) -> list[dict[str, Any]]:
         """Get all media from Plex. \n
         Returns:
@@ -275,6 +275,7 @@ class BaseConnectionManager(ABC):
         self.update_media_status_bulk(update_list)
         return
 
+
 class PlexConnectionManager(ABC):
     """Connection manager for working with Plex.
     Abstract class that provides the base functionality for working with Plex.
@@ -306,7 +307,7 @@ class PlexConnectionManager(ABC):
             return await self.plex_manager.get_system_status()
         except Exception:
             return None
-        
+
     async def get_media_data(self) -> list[dict[str, Any]]:
         """Get the data from Plex. \n
         Returns:
@@ -327,7 +328,7 @@ class PlexConnectionManager(ABC):
             self.parse_media(self.connection_id, each_media_data)
             for each_media_data in media_data
         ]
-    
+
     async def _check_trailer(self, rating_key: int) -> bool:
         """Check if a trailer exists for the media in plex.\n
         Args:
@@ -336,37 +337,41 @@ class PlexConnectionManager(ABC):
             bool: True if the trailer exists, False otherwise."""
         trailer_exists = await self.plex_manager.has_trailers(rating_key)
         return trailer_exists
-    
+
     def update_bulk(self, media_data: list[MediaCreate]) -> list[MediaReadDC]:
         """Update existing media in the database based on Plex data.
-        
+
         Args:
             media_data (list[MediaCreate]): The media data to update.
 
         Returns:
             list[MediaReadDC]: A list of updated MediaRead objects for existing entries.
-        """        
-        media_read_list = MediaDatabaseManager().create_or_update_bulk(media_data, isPlex=True)
-        
+        """
+        media_read_list = MediaDatabaseManager().create_or_update_bulk(
+            media_data, isPlex=True
+        )
+
         # Convert database results to MediaReadDC objects
         return [
             MediaReadDC(
                 id=media_read.id,
                 created=created,
-                plex_rating_key=media_read.plex_rating_key
+                folder_path=media_read.folder_path,
+                arr_monitored=media_read.arr_monitored,
+                monitor=media_read.monitor,
+                status=media_read.status,
+                plex_rating_key=media_read.plex_rating_key,
             )
             for media_read, created in media_read_list
         ]
 
-    
     def update_media_status_bulk(self, media_update_list: list[MediaUpdateDC]) -> None:
         """Update the media attributes in the database.
-        
+
         Args:
             media_update_list (list[MediaUpdateDC]): List of media update data.
         """
         MediaDatabaseManager().update_media_status_bulk(media_update_list)
-
 
     async def refresh(self):
         """Gets new data from Plex API and updates the plex_trailer_exists
@@ -382,15 +387,14 @@ class PlexConnectionManager(ABC):
         update_list: list[MediaUpdateDC] = []
         for media_read in media_res:
             trailer_exists = await self._check_trailer(media_read.rating_key)
-            
+
             update_list.append(
                 MediaUpdateDC(
                     id=media_read.id,
                     plex_trailer_exists=trailer_exists,
-                    plex_rating_key=media_read.plex_rating_key
+                    plex_rating_key=media_read.plex_rating_key,
                 )
             )
         # Update the database with trailer and plex rating key
         self.update_media_status_bulk(update_list)
         return
-

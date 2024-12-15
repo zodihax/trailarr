@@ -1,4 +1,5 @@
 from core.base.connection_manager import PlexConnectionManager
+from core.plex.data_parser import parse_media
 from core.base.database.models.connection import ConnectionRead
 from core.plex.api_manager import PlexManager
 
@@ -17,4 +18,5 @@ class PlexConnectionManager(PlexConnectionManager):
         super().__init__(
             connection,
             plex_manager,
+            parse_media,
         )

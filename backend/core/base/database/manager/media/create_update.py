@@ -18,7 +18,7 @@ class MediaCreateUpdateManager:
     __model_name = "Media"
 
     def _create_or_update(
-        self, media_create: MediaCreate, session: Session
+        self, media_create: MediaCreate, session: Session, isPlex: bool = False
     ) -> tuple[Media, bool, bool]:
         """🚨This is a private method🚨 \n
         Create or update a media in the database. \n
@@ -34,6 +34,8 @@ class MediaCreateUpdateManager:
         """
         db_media = _base._read_if_exists(
             media_create.connection_id, media_create.txdb_id, session
+        ) if not isPlex else _base._read_if_exists_plex(
+            media_create.title, media_create.year, session
         )
         if db_media:
             # Exists, update it
@@ -50,8 +52,8 @@ class MediaCreateUpdateManager:
                 _updated = True
             session.add(db_media)
             return db_media, False, _updated
-        else:
-            # Doesn't exist, Create it
+        elif not isPlex:
+            # Doesn't exist, and from Arr, Create it
             db_media = Media.model_validate(media_create)
             session.add(db_media)
             return db_media, True, False

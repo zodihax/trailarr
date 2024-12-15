@@ -97,3 +97,31 @@ class BaseMediaManager:
         )
         db_media = session.exec(statement).first()
         return db_media
+    
+    def _read_if_exists_plex(
+        self,
+        title: str,
+        year: int,
+        session: Session,
+    ) -> Media | None:
+        """🚨This is a private method🚨 \n
+        Check if a media item exists in the database for any given connection and arr ids.\n
+        Args:
+            title (str): The title of the media item to check.
+            year (str): The year of the media item to check.
+            session (Session): A session to use for the database connection.\n
+        Returns:
+            Media | None: The media object if it exists, otherwise None.
+        """
+        statement = (
+            select(Media)
+            .where(Media.title == title)
+            .where(Media.year == year)
+        )
+        iterator = iter(session.exec(statement)) # Iterating over only the two first to minimize memory usage
+        first_item = next(iterator, None)
+        second_item = next(iterator, None)
+
+        if second_item is not None:  # If there are more than one result, skip
+            return None
+        return first_item

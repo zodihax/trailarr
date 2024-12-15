@@ -328,27 +328,15 @@ class PlexConnectionManager(ABC):
             for each_media_data in media_data
         ]
     
-    def get_media(self, title: str, year: int) -> int | None:
-        """Queries the database to get a match of media by title and year.
-        
+    async def _check_trailer(self, rating_key: int) -> bool:
+        """Check if a trailer exists for the media in plex.\n
         Args:
-            title (str): Title of the media.
-            year (int): Release year of the media.
-            
+            rating_key (int): The unique identifyer for the media.\n
         Returns:
-            int: The ID of the matching media if found.
-            None: If no matching media is found.
-        """
-        titles = MediaDatabaseManager().search(title)        
-        if not titles:
-            return None        
-        for media in titles:
-            if media.title.lower() == title.lower() and media.year == year:
-                return MediaCreate(
-                    id=media.id
-                )    
-        return None
-
+            bool: True if the trailer exists, False otherwise."""
+        trailer_exists = await self.plex_manager.has_trailers(rating_key)
+        return trailer_exists
+    
     def update_bulk(self, media_data: list[MediaCreate]) -> list[MediaReadDC]:
         """Update existing media in the database based on Plex data.
         
@@ -363,24 +351,16 @@ class PlexConnectionManager(ABC):
             media for media in media_data 
             if self.get_media(media.title, media.year) is not None
         ]
-
-        existing_media2 = [
-            MediaCreate(
-                id=self.get_media(media.title, media.year),
-                plex_ratingkey=media.plex_ratingkey
-            )
-            for media in existing_media
-        ]        
         
         # Update existing media in bulk
-        updated_media = MediaDatabaseManager().create_or_update_bulk(existing_media2)
+        updated_media = MediaDatabaseManager().create_or_update_bulk(existing_media)
         
         # Convert database results to MediaReadDC objects
         return [
             MediaReadDC(
                 id=media_read.id,
                 created=created,
-                plex_ratingkey=media_read.plex_ratingkey
+                plex_rating_key=media_read.plex_rating_key
             )
             for media_read, created in updated_media
         ]
@@ -396,7 +376,8 @@ class PlexConnectionManager(ABC):
 
 
     async def refresh(self):
-        """Gets new data from Plex API and updates the plex_trailer_exists field for existing entries."""
+        """Gets new data from Plex API and updates the plex_trailer_exists
+        and plex_rating_key field for existing entries."""
         # Fetch and parse media data from Plex
         parsed_media = await self._parse_data()
         if len(parsed_media) == 0:
@@ -405,19 +386,18 @@ class PlexConnectionManager(ABC):
 
         media_res = self.update_bulk(parsed_media)
 
-        # Prepare media update list for `plex_trailer_exists`
         update_list: list[MediaUpdateDC] = []
         for media_read in media_res:
-            plex_trailer_exists = await self.plex_manager.has_trailers(media_read.rating_key)
-            # Append to the update list
+            trailer_exists = await self._check_trailer(media_read.rating_key)
+            
             update_list.append(
                 MediaUpdateDC(
                     id=media_read.id,
-                    plex_trailer_exists=plex_trailer_exists,
-                    plex_ratingkey=media_read.plex_ratingkey
+                    plex_trailer_exists=trailer_exists,
+                    plex_rating_key=media_read.plex_rating_key
                 )
             )
-        # Update the database with trailer and monitoring status
+        # Update the database with trailer and plex rating key
         self.update_media_status_bulk(update_list)
         return
 

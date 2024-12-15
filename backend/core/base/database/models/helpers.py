@@ -40,7 +40,7 @@ class MediaReadDC:
     arr_monitored: bool
     monitor: bool
     status: MonitorStatus
-    plex_ratingkey: int | None = None
+    plex_rating_key: int | None = None
 
 
 @dataclass(eq=False, frozen=True, repr=False, slots=True)
@@ -50,7 +50,7 @@ class MediaUpdateDC:
     status: MonitorStatus
     trailer_exists: bool | None = None
     yt_id: str | None = None
-    plex_ratingkey: int | None = None
+    plex_rating_key: int | None = None
     downloaded_at: datetime | None = None
     plex_trailer_exists: bool | None = None
 

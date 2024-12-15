@@ -58,11 +58,14 @@ class PlexManager(AsyncBasePlexManager):
             return media
         raise InvalidResponseError("Invalid response from Plex API")
 
-    async def get_all_movies(self) -> list[dict[str, Any]]:
-        """Get all movies from the Plex API.
+    async def _get_all_media_by_type(self, media_type: int) -> list[dict[str, Any]]:
+        """Get all media of a specific type from the Plex API.
+
+        Args:
+            media_type (int): The type of media to fetch (1 for movies, 2 for series, etc.).
 
         Returns:
-            List[Dict[str, Any]]: All movies with their Metadata from the Plex API.
+            list[dict[str, Any]]: All media of the specified type with their Metadata from the Plex API.
 
         Raises:
             ConnectionError: If the connection is refused / response is not 200.
@@ -70,46 +73,20 @@ class PlexManager(AsyncBasePlexManager):
             InvalidResponseError: If the API response is invalid.
         """
         section_ids = await self._get_all_section_ids()
-        movies = []
+        media = []
         for section_id in section_ids:
-            response = await self._request("GET", f"/library/sections/{section_id}/all?type=1")
+            response = await self._request("GET", f"/library/sections/{section_id}/all?type={media_type}")
             metadata = response.get('MediaContainer', {}).get('Metadata', [])
-            if isinstance(movies, list):
-                movies.extend(metadata)
+            if isinstance(media, list):
+                media.extend(metadata)
             else:
-                raise InvalidResponseError("Invalid response format for Metadata in Plex API")            
-        return movies
-
-    async def get_all_series(self) -> list[dict[str, Any]]:
-        """Get all series from the Plex API.
-
-        Returns:
-            List[Dict[str, Any]]: All series with their Metadata from the Plex API.
-
-        Raises:
-            ConnectionError: If the connection is refused / response is not 200.
-            ConnectionTimeoutError: If the connection times out.
-            InvalidResponseError: If the API response is invalid.
-        """
-        section_ids = await self._get_all_section_ids()
-        series = []
-        for section_id in section_ids:
-            response = await self._request("GET", f"/library/sections/{section_id}/all?type=2")
-            metadata = response.get('MediaContainer', {}).get('Metadata', [])
-            if isinstance(series, list):
-                series.extend(metadata)
-            else:
-                raise InvalidResponseError("Invalid response format for Metadata in Plex API")            
-        return series
+                raise InvalidResponseError("Invalid response format for Metadata in Plex API")
+        return media
 
     async def get_all_media(self) -> list[dict[str, Any]]:
-        """Get all media from the Plex API
-
-        Returns:
-            list[str, Any]: All series with their Metadata from the Plex API
-        """
-        movies = await self.get_all_movies()
-        series = await self.get_all_series()
+        """Get all media (movies and series) from the Plex API."""
+        movies = await self._get_all_media_by_type(1)
+        series = await self._get_all_media_by_type(2)
         return movies + series
         
     async def has_trailers(self, rating_key):

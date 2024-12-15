@@ -35,7 +35,7 @@ class MediaCreateUpdateManager:
         db_media = _base._read_if_exists(
             media_create.connection_id, media_create.txdb_id, session
         ) if not isPlex else _base._read_if_exists_plex(
-            media_create.title, media_create.year, session
+            media_create.title, media_create.year, media_create.plex_rating_key, session
         )
         if db_media:
             # Exists, update it
@@ -183,10 +183,10 @@ class MediaCreateUpdateManager:
             db_media.downloaded_at = media_update.downloaded_at
         if media_update.yt_id:
             db_media.youtube_trailer_id = media_update.yt_id
-        if media_update.plex_ratingkey:
-            db_media.plex_ratingkey = media_update.plex_ratingkey
+        if media_update.plex_rating_key:
+            db_media.plex_rating_key = media_update.plex_rating_key
         if media_update.plex_trailer_exists:
-            db_media.plex_ratingkey = media_update.plex_trailer_exists
+            db_media.plex_rating_key = media_update.plex_trailer_exists
         _session.add(db_media)
         if _commit:
             _session.commit()

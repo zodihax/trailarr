@@ -39,7 +39,7 @@ class MediaBase(SQLModel):
     runtime: int = 0
     # website: str | None = None
     youtube_trailer_id: str | None = None
-    plex_ratingkey: int | None = None
+    plex_rating_key: int | None = None
     folder_path: str | None = None
     imdb_id: str | None = Field(default=None, index=True)
     txdb_id: str = Field(index=True)
@@ -81,7 +81,7 @@ class MediaCreate(MediaBase):
     - youtube_trailer_id: None
     - trailer_exists: False
     - plex_trailer_exists: False
-    - plex_ratingkey: None
+    - plex_rating_key: None
     - monitor: False
     - arr_monitored: False
     """
@@ -108,7 +108,7 @@ class MediaUpdate(MediaBase):
 
     connection_id: int | None = None
     arr_id: int | None = None
-    plex_ratingkey: int | None = None
+    plex_rating_key: int | None = None
     title: str | None = None
     year: int | None = None
     language: str | None = None

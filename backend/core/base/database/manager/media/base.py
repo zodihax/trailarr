@@ -102,7 +102,8 @@ class BaseMediaManager:
         self,
         title: str,
         year: int,
-        session: Session,
+        rating_key: int,
+        session: Session,        
     ) -> Media | None:
         """🚨This is a private method🚨 \n
         Check if a media item exists in the database for any given connection and arr ids.\n
@@ -117,11 +118,21 @@ class BaseMediaManager:
             select(Media)
             .where(Media.title == title)
             .where(Media.year == year)
-        )
-        iterator = iter(session.exec(statement)) # Iterating over only the two first to minimize memory usage
-        first_item = next(iterator, None)
-        second_item = next(iterator, None)
+            .where(Media.plex_rating_key == rating_key)
+        ) 
 
-        if second_item is not None:  # If there are more than one result, skip
-            return None
-        return first_item
+        db_media = session.exec(statement).first()
+        if not db_media:
+            statement = (
+            select(Media)
+            .where(Media.title == title)
+            .where(Media.year == year)
+        ) 
+            
+        # Iterating over only the two first to minimize memory usage
+        iterator = iter(session.exec(statement)) 
+        db_media = next(iterator, None)
+        if next(iterator, None) is not None:  
+            return None # If there are more than one result, skip
+        
+        return db_media

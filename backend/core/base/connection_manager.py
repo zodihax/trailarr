@@ -346,7 +346,7 @@ class PlexConnectionManager(ABC):
         Returns:
             list[MediaReadDC]: A list of updated MediaRead objects for existing entries.
         """        
-        media_read_list = MediaDatabaseManager().create_or_update_bulk(media_data, True)
+        media_read_list = MediaDatabaseManager().create_or_update_bulk(media_data, isPlex=True)
         
         # Convert database results to MediaReadDC objects
         return [

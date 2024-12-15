@@ -39,7 +39,7 @@ class MediaBase(SQLModel):
     runtime: int = 0
     # website: str | None = None
     youtube_trailer_id: str | None = None
-    plex_rating_key: int | None = None
+    plex_rating_key: int | None = 0
     folder_path: str | None = None
     imdb_id: str | None = Field(default=None, index=True)
     txdb_id: str = Field(index=True)

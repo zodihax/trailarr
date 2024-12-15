@@ -345,15 +345,8 @@ class PlexConnectionManager(ABC):
 
         Returns:
             list[MediaReadDC]: A list of updated MediaRead objects for existing entries.
-        """
-        # Filter the provided media_data to update only existing entries
-        existing_media = [
-            media for media in media_data 
-            if self.get_media(media.title, media.year) is not None
-        ]
-        
-        # Update existing media in bulk
-        updated_media = MediaDatabaseManager().create_or_update_bulk(existing_media)
+        """        
+        media_read_list = MediaDatabaseManager().create_or_update_bulk(media_data)
         
         # Convert database results to MediaReadDC objects
         return [
@@ -362,7 +355,7 @@ class PlexConnectionManager(ABC):
                 created=created,
                 plex_rating_key=media_read.plex_rating_key
             )
-            for media_read, created in updated_media
+            for media_read, created in media_read_list
         ]
 
     

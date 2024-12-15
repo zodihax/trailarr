@@ -32,10 +32,17 @@ class MediaCreateUpdateManager:
             Example::\n
                 (<Media obj>, True)
         """
-        db_media = _base._read_if_exists(
-            media_create.connection_id, media_create.txdb_id, session
-        ) if not isPlex else _base._read_if_exists_plex(
-            media_create.title, media_create.year, media_create.plex_rating_key, session
+        db_media = (
+            _base._read_if_exists(
+                media_create.connection_id, media_create.txdb_id, session
+            )
+            if not isPlex
+            else _base._read_if_exists_plex(
+                media_create.title,
+                media_create.year,
+                media_create.plex_rating_key,
+                session,
+            )
         )
         if db_media:
             # Exists, update it
@@ -57,6 +64,8 @@ class MediaCreateUpdateManager:
             db_media = Media.model_validate(media_create)
             session.add(db_media)
             return db_media, True, False
+        else:
+            return None, False, False
 
     @manage_session
     def create_or_update_bulk(
@@ -85,7 +94,11 @@ class MediaCreateUpdateManager:
         new_count: int = 0
         updated_count: int = 0
         for media_create in media_create_list:
-            db_media, created, updated = self._create_or_update(media_create, _session, isPlex)
+            db_media, created, updated = self._create_or_update(
+                media_create, _session, isPlex
+            )
+            if db_media is None and not created and not updated:
+                continue
             db_media_list.append((db_media, created))
             if created:
                 new_count += 1

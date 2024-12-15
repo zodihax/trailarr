@@ -73,6 +73,8 @@ class MediaDatabaseManager:
             db_media, created, updated = self._create_or_update(
                 media_create, _session, isPlex
             )
+            if db_media is None and not created and not updated:
+                continue
             db_media_list.append((db_media, created))
             if created:
                 new_count += 1
@@ -644,6 +646,8 @@ class MediaDatabaseManager:
             db_media = Media.model_validate(media_create)
             session.add(db_media)
             return db_media, True, False
+        else:
+            return None, False, False
 
     def _check_connection_exists(self, connection_id: int, session: Session) -> None:
         """🚨This is a private method🚨 \n

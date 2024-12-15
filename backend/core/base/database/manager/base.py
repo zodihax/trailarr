@@ -848,4 +848,5 @@ class MediaDatabaseManager:
             logger.debug("Plex: Found more than one result, skipping.")
             return None  # If there are more than one result, skip
 
+        logger.debug(f"Plex: result is {db_media}")
         return db_media

@@ -70,7 +70,9 @@ class MediaDatabaseManager:
         new_count: int = 0
         updated_count: int = 0
         for media_create in media_create_list:
-            db_media, created, updated = self._create_or_update(media_create, _session, isPlex)
+            db_media, created, updated = self._create_or_update(
+                media_create, _session, isPlex
+            )
             db_media_list.append((db_media, created))
             if created:
                 new_count += 1
@@ -610,10 +612,17 @@ class MediaDatabaseManager:
             Example::\n
                 (<Media obj>, True)
         """
-        db_media = self._read_if_exists(
-            media_create.connection_id, media_create.txdb_id, session
-        ) if not isPlex else self._read_if_exists_plex(
-            media_create.title, media_create.year, media_create.plex_rating_key, session
+        db_media = (
+            self._read_if_exists(
+                media_create.connection_id, media_create.txdb_id, session
+            )
+            if not isPlex
+            else self._read_if_exists_plex(
+                media_create.title,
+                media_create.year,
+                media_create.plex_rating_key,
+                session,
+            )
         )
         if db_media:
             # Exists, update it
@@ -630,8 +639,8 @@ class MediaDatabaseManager:
                 _updated = True
             session.add(db_media)
             return db_media, False, _updated
-        else:
-            # Doesn't exist, Create it
+        elif not isPlex:
+            # Doesn't exist, and from Arr, Create it
             db_media = Media.model_validate(media_create)
             session.add(db_media)
             return db_media, True, False
@@ -796,13 +805,13 @@ class MediaDatabaseManager:
         )
         db_media = session.exec(statement).first()
         return db_media
-    
+
     def _read_if_exists_plex(
         self,
         title: str,
         year: int,
         rating_key: int,
-        session: Session,        
+        session: Session,
     ) -> Media | None:
         """🚨This is a private method🚨 \n
         Check if a media item exists in the database for any given connection and arr ids.\n
@@ -818,20 +827,18 @@ class MediaDatabaseManager:
             .where(Media.title == title)
             .where(Media.year == year)
             .where(Media.plex_rating_key == rating_key)
-        ) 
+        )
 
         db_media = session.exec(statement).first()
         if not db_media:
             statement = (
-            select(Media)
-            .where(Media.title == title)
-            .where(Media.year == year)
-        ) 
-            
+                select(Media).where(Media.title == title).where(Media.year == year)
+            )
+
         # Iterating over only the two first to minimize memory usage
-        iterator = iter(session.exec(statement)) 
+        iterator = iter(session.exec(statement))
         db_media = next(iterator, None)
-        if next(iterator, None) is not None:  
-            return None # If there are more than one result, skip
-        
+        if next(iterator, None) is not None:
+            return None  # If there are more than one result, skip
+
         return db_media

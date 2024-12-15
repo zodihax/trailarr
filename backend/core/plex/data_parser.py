@@ -24,4 +24,5 @@ def parse_media(connection_id: int, media_data: dict[str, Any]) -> MediaCreate:
     media_parsed = PlexDataParser(**media_data)
     media_parsed.connection_id = connection_id
 
-    return MediaCreate.model_validate(media_parsed.model_dump())
+    # Skip model validation, since Plex never creates entries
+    return MediaCreate(**media_parsed.model_dump())

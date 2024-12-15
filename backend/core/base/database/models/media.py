@@ -42,7 +42,7 @@ class MediaBase(SQLModel):
     plex_rating_key: int | None = None
     folder_path: str | None = None
     imdb_id: str | None = Field(default=None, index=True)
-    txdb_id: str = Field(default=None, index=True)
+    txdb_id: str = Field(index=True)
     poster_url: str | None = None
     fanart_url: str | None = None
     poster_path: str | None = None

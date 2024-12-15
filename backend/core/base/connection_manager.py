@@ -386,7 +386,11 @@ class PlexConnectionManager(ABC):
 
         update_list: list[MediaUpdateDC] = []
         for media_read in media_res:
+            logger.debug(f"Checking trailer for {media_read.plex_rating_key}")
             trailer_exists = await self._check_trailer(media_read.plex_rating_key)
+            logger.debug(
+                f"Trailer found for {media_read.plex_rating_key} = {trailer_exists}"
+            )
 
             update_list.append(
                 MediaUpdateDC(

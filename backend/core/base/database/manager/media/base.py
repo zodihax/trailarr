@@ -8,6 +8,7 @@ from core.base.database.models.media import (
     MediaRead,
 )
 from exceptions import ItemNotFoundError
+from app_logger import logger
 
 
 class BaseMediaManager:
@@ -121,16 +122,19 @@ class BaseMediaManager:
             .where(Media.plex_rating_key == rating_key)
         )
 
+        logger.debug(f"Plex (media): querying for {title} ({year}) [{rating_key}].")
         db_media = session.exec(statement).first()
         if not db_media:
             statement = (
                 select(Media).where(Media.title == title).where(Media.year == year)
             )
 
+        logger.debug(f"Plex (media): not found. Querying with {title} ({year}).")
         # Iterating over only the two first to minimize memory usage
         iterator = iter(session.exec(statement))
         db_media = next(iterator, None)
         if next(iterator, None) is not None:
+            logger.debug("Plex (media): Found more than one result, skipping.")
             return None  # If there are more than one result, skip
 
         return db_media
